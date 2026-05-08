@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOCKS5 Proxy Server - 详细教程与安装指南</title>
+    <meta name="description" content="SOCKS5 Proxy Server 详细教程，包含编译、运行、参数配置、Linux 自动安装、服务管理、systemd 配置以及客户端代理使用方法。">
+    <meta name="keywords" content="SOCKS5教程, 代理服务器安装, Go语言代理, Linux代理设置, systemd, curl代理, 浏览器代理">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>SOCKS5 Proxy Server</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="tutorial.html">教程</a></li>
+                    <li><a href="downloads.html">下载</a></li>
+                </ul>
+            </nav>
+            <div class="free-proxy-link">
+                <a href="https://tomcat1235.nyc.mn/" target="_blank">免费socks5代理</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="tutorial-content" class="content-section">
+            <div class="container">
+                <h2>详细教程与安装指南</h2>
+
+                <p>欢迎使用 SOCKS5 Proxy Server！为了方便您快速开始，我们强烈建议您直接从 <a href="downloads.html">下载页面</a> 获取预编译的二进制文件。</p>
+                <p>根据您的操作系统和架构下载相应的版本后，即可按照以下教程进行配置和使用。</p>
+
+                <h3>运行</h3>
+                <p>下载二进制文件后，您可以根据需求选择不同的运行方式。例如，如果您下载的是 Linux 64 位版本，文件名为 <code>socks5-linux-amd64</code>。</p>
+                <h4>默认运行 (无认证)</h4>
+                <pre><code># 给下载的二进制文件添加执行权限
+chmod +x socks5-linux-amd64
+
+# 运行 (以 Linux 64 位版本为例)
+./socks5-linux-amd64</code></pre>
+                <h4>运行 (带认证)</h4>
+                <pre><code>./socks5-linux-amd64 -host=0.0.0.0 -port=58367 -username=youruser -password=yourpass</code></pre>
+                <h4>参数说明</h4>
+                <ul>
+                    <li><code>-host</code>: 监听地址 (默认: 0.0.0.0)</li>
+                    <li><code>-port</code>: 监听端口 (默认: 58367)</li>
+                    <li><code>-username</code>: 认证用户名 (默认: 空，表示不启用认证)</li>
+                    <li><code>-password</code>: 认证密码 (默认: 空，表示不启用认证)</li>
+                    <li><code>-debug</code>: 启用调试模式 (默认: false)</li>
+                </ul>
+
+                <h3>自动安装 (Linux)</h3>
+                <p>在 Linux 系统上，您可以使用自动安装脚本来快速部署。此脚本将自动下载最新版本并进行安装。</p>
+                <p>您可以直接在终端执行以下命令进行安装：</p>
+                <pre><code>bash <(curl -Ls https://pub-f49c78b9eb854878a5ee1d8e3c61aae8.r2.dev/socks5/install-socks5.sh) auto</code></pre>
+                <p>如果需要指定认证信息和端口，可以使用：</p>
+                <pre><code>bash <(curl -Ls https://pub-f49c78b9eb854878a5ee1d8e3c61aae8.r2.dev/socks5/install-socks5.sh) auto youruser yourpass 58367</code></pre>
+                <p>您也可以 <a href="install-script.html">点击此处查看完整的安装脚本内容</a>，方便复制和理解。</p>
+                <h4>智能安装特性：</h4>
+                <ul>
+                    <li>自动检测是否已安装服务。</li>
+                    <li>如果已安装，则执行重新安装。</li>
+                    <li>如果未安装，则执行正常安装。</li>
+                    <li>程序文件会被重命名为随机的 4 位字母 + .py 格式（如 <code>abcd.py</code>），简单伪装成 Python 脚本。</li>
+                    <li>自动获取服务器 IP 地址并生成完整的 SOCKS5 代理地址。</li>
+                    <li>测试代理功能并显示测试结果。</li>
+                </ul>
+                <p>示例输出:</p>
+                <pre><code>socks5://mypix:mypass550@YOUR_SERVER_IP:58367</code></pre>
+
+                <h3>服务管理命令</h3>
+                <p>安装后，您可以使用以下命令管理服务。</p>
+                <pre><code># 自动安装/重新安装（推荐）
+sudo ./install-socks5.sh auto
+
+# 安装服务
+sudo ./install-socks5.sh install
+
+# 卸载服务
+sudo ./install-socks5.sh uninstall
+
+# 重新安装服务
+sudo ./install-socks5.sh reinstall
+
+# 查看服务状态
+sudo ./install-socks5.sh status</code></pre>
+
+                <h3>systemd 服务管理</h3>
+                <p>如果服务通过安装脚本部署，也可以使用 systemd 管理。</p>
+                <pre><code># 启动服务
+sudo systemctl start socks5-proxy
+
+# 停止服务
+sudo systemctl stop socks5-proxy
+
+# 重启服务
+sudo systemctl restart socks5-proxy
+
+# 查看服务状态
+sudo systemctl status socks5-proxy
+
+# 设置开机自启
+sudo systemctl enable socks5-proxy</code></pre>
+
+                <h3>使用代理</h3>
+                <h4>curl</h4>
+                <pre><code>curl --socks5 youruser:yourpass@YOUR_SERVER_IP:58367 https://www.google.com</code></pre>
+                <h4>浏览器</h4>
+                <p>在浏览器设置中配置 SOCKS5 代理：</p>
+                <ul>
+                    <li>地址: YOUR_SERVER_IP</li>
+                    <li>端口: 58367</li>
+                    <li>认证: youruser/yourpass</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 SOCKS5 Proxy Server. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
