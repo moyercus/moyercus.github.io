@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOCKS5 Proxy Server - 安装脚本</title>
+    <meta name="description" content="SOCKS5 Proxy Server 自动化安装脚本内容，方便用户查看和复制，支持Linux系统快速部署。">
+    <meta name="keywords" content="SOCKS5安装脚本, 代理服务器脚本, install-socks5.sh, Linux自动安装, 脚本复制">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>SOCKS5 Proxy Server</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="tutorial.html">教程</a></li>
+                    <li><a href="downloads.html">下载</a></li>
+                </ul>
+            </nav>
+            <div class="free-proxy-link">
+                <a href="https://tomcat1235.nyc.mn/" target="_blank">免费socks5代理</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="install-script" class="content-section">
+            <div class="container">
+                <h2>`install-socks5.sh` 脚本内容</h2>
+                <p>以下是 SOCKS5 代理服务器的自动化安装脚本。您可以复制以下内容并在您的 Linux 服务器上执行，或者直接使用教程页面提供的推荐命令。</p>
+                <button class="copy-button" onclick="copyScript()">复制脚本</button>
+                <pre><code id="installScriptContent">#!/bin/bash
+
+# SOCKS5 Proxy Server Installation Script
+# This script automates the installation, uninstallation, and management of the SOCKS5 proxy server.
+
+# Configuration
+SERVICE_NAME="socks5-proxy"
+INSTALL_DIR="/usr/local/bin"
+SOCKS5_BINARY_NAME="socks5"
+
+# Public URL for binaries and this script
+BASE_URL="https://pub-f49c78b9eb854878a5ee1d8e3c61aae8.r2.dev/socks5"
+
+# Default credentials (can be overridden by command line arguments)
+DEFAULT_USERNAME="mypix"
+DEFAULT_PASSWORD="mypass550"
+DEFAULT_PORT="58367"
+
+# Function to generate a random filename for obfuscation
+generate_random_filename() {
+    head /dev/urandom | tr -dc a-z | head -c 4
+}
+
+# Function to detect OS and architecture
+detect_os_arch() {
+    OS=$(uname -s)
+    ARCH=$(uname -m)
+
+    case "$OS" in
+        Linux)
+            case "$ARCH" in
+                x86_64) BINARY_ARCH="linux-amd64";; # 64-bit Linux
+                i386|i686) BINARY_ARCH="linux-386";; # 32-bit Linux
+                armv6l|armv7l) BINARY_ARCH="linux-arm";; # ARM Linux
+                aarch64) BINARY_ARCH="linux-arm64";; # ARM64 Linux
+                *) echo "Unsupported Linux architecture: $ARCH"; exit 1;;
+            esac
+            ;; # End Linux case
+        Darwin)
+            case "$ARCH" in
+                x86_64) BINARY_ARCH="darwin-amd64";; # macOS Intel
+                arm64) BINARY_ARCH="darwin-arm64";; # macOS Apple Silicon
+                *) echo "Unsupported macOS architecture: $ARCH"; exit 1;;
+            esac
+            ;; # End Darwin case
+        FreeBSD)
+            case "$ARCH" in
+                x86_64) BINARY_ARCH="freebsd-amd64";; # 64-bit FreeBSD
+                *) echo "Unsupported FreeBSD architecture: $ARCH"; exit 1;;
+            esac
+            ;; # End FreeBSD case
+        *)
+            echo "Unsupported OS: $OS"; exit 1;;
+    esac
+}
+
+# Function to get public IP address
+get_public_ip() {
+    curl -s checkip.amazonaws.com || curl -s ipinfo.io/ip || curl -s ifconfig.me
+}
+
+# Function to check if SOCKS5 service is running
+is_service_installed() {
+    systemctl is-active --quiet ${SERVICE_NAME} || systemctl is-enabled --quiet ${SERVICE_NAME}
+}
+
+# Function to install/reinstall SOCKS5 proxy
+install_socks5() {
+    echo "Detecting OS and architecture..."
+    detect_os_arch
+    echo "Detected: ${OS} - ${BINARY_ARCH}"
+
+    DOWNLOAD_URL="${BASE_URL}/${SOCKS5_BINARY_NAME}-${BINARY_ARCH}"
+    TEMP_BINARY="/tmp/${SOCKS5_BINARY_NAME}-${BINARY_ARCH}"
+    
+    # Handle Windows binaries (.exe)
+    if [[ "${BINARY_ARCH}" == "windows-386" || "${BINARY_ARCH}" == "windows-amd64" ]]; then
+        DOWNLOAD_URL="${DOWNLOAD_URL}.exe"
+    }
+
+    echo "Downloading SOCKS5 binary from ${DOWNLOAD_URL}..."
+    if ! curl -sSL -o "${TEMP_BINARY}" "${DOWNLOAD_URL}"; then
+        echo "Error: Failed to download SOCKS5 binary from ${DOWNLOAD_URL}"
+        exit 1
+    }
+
+    chmod +x "${TEMP_BINARY}"
+
+    # Generate a random filename for obfuscation (e.g., abcd.py)
+    RANDOM_FILENAME="$(generate_random_filename).py"
+    FINAL_BINARY_PATH="${INSTALL_DIR}/${RANDOM_FILENAME}"
+
+    echo "Installing SOCKS5 binary to ${FINAL_BINARY_PATH}..."
+    sudo mv "${TEMP_BINARY}" "${FINAL_BINARY_PATH}"
+
+    # Create systemd service file
+    SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
+    
+    # Get username and password from command line args or use defaults
+    USERNAME=${1:-$DEFAULT_USERNAME}
+    PASSWORD=${2:-$DEFAULT_PASSWORD}
+    PORT=${3:-$DEFAULT_PORT}
+
+    echo "Creating systemd service ${SERVICE_NAME}.service..."
+    sudo bash -c "cat > ${SERVICE_FILE} <<EOF
+[Unit]
+Description=SOCKS5 Proxy Server
+After=network.target
+
+[Service]
+User=root
+ExecStart=${FINAL_BINARY_PATH} -host=0.0.0.0 -port=${PORT} -username=${USERNAME} -password=${PASSWORD}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF"
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable ${SERVICE_NAME}
+    sudo systemctl start ${SERVICE_NAME}
+
+    if systemctl is-active --quiet ${SERVICE_NAME}; then
+        echo "SOCKS5 proxy server installed and started successfully!"
+        SERVER_IP=$(get_public_ip)
+        echo "Your SOCKS5 Proxy Address: socks5://${USERNAME}:${PASSWORD}@${SERVER_IP}:${PORT}"
+        # Test proxy (optional)
+        echo "Testing proxy functionality..."
+        if curl -x "socks5://${USERNAME}:${PASSWORD}@${SERVER_IP}:${PORT}" -s -m 5 https://www.google.com > /dev/null; then
+            echo "Proxy test: SUCCESS"
+        else
+            echo "Proxy test: FAILED (Check logs with 'sudo journalctl -u ${SERVICE_NAME}')"
+        fi
+    else
+        echo "Error: SOCKS5 proxy server failed to start. Check logs with 'sudo journalctl -u ${SERVICE_NAME}'"
+        exit 1
+    fi
+}
+
+# Function to uninstall SOCKS5 proxy
+uninstall_socks5() {
+    echo "Stopping SOCKS5 proxy service..."
+    sudo systemctl stop ${SERVICE_NAME}
+    sudo systemctl disable ${SERVICE_NAME}
+    echo "Removing SOCKS5 service file..."
+    sudo rm -f "/etc/systemd/system/${SERVICE_NAME}.service"
+    sudo systemctl daemon-reload
+    echo "Removing SOCKS5 binary..."
+    # Find the randomly named binary
+    BINARY_TO_REMOVE=$(find ${INSTALL_DIR} -name "*.py" -type f -exec grep -l "SOCKS5 Proxy Server" {} + | head -n 1)
+    if [ -n "$BINARY_TO_REMOVE" ]; then
+        sudo rm -f "$BINARY_TO_REMOVE"
+        echo "Removed binary: $BINARY_TO_REMOVE"
+    else
+        echo "Could not find SOCKS5 binary to remove in ${INSTALL_DIR}."
+    }
+    echo "SOCKS5 proxy server uninstalled."
+}
+
+# Function to check status
+status_socks5() {
+    systemctl status ${SERVICE_NAME}
+}
+
+# Main logic
+case "$1" in
+    install)
+        install_socks5 "$2" "$3" "$4"
+        ;;
+    uninstall)
+        uninstall_socks5
+        ;;
+    reinstall)
+        uninstall_socks5
+        install_socks5 "$2" "$3" "$4"
+        ;;
+    status)
+        status_socks5
+        ;;
+    auto)
+        if is_service_installed; then
+            echo "SOCKS5 service detected. Reinstalling..."
+            reinstall "$2" "$3" "$4"
+        else
+            echo "SOCKS5 service not detected. Installing..."
+            install_socks5 "$2" "$3" "$4"
+        }
+        ;;
+    *)
+        echo "Usage: $0 {install|uninstall|reinstall|status|auto} [username] [password] [port]"
+        echo "  install      - Install the SOCKS5 proxy server."
+        echo "  uninstall    - Uninstall the SOCKS5 proxy server."
+        echo "  reinstall    - Reinstall the SOCKS5 proxy server."
+        echo "  status       - Show the status of the SOCKS5 proxy server."
+        echo "  auto         - Auto-detects and installs/reinstalls the SOCKS5 proxy server."
+        echo "  [username]   - Optional: Username for SOCKS5 authentication (default: ${DEFAULT_USERNAME})"
+        echo "  [password]   - Optional: Password for SOCKS5 authentication (default: ${DEFAULT_PASSWORD})"
+        echo "  [port]       - Optional: Port for SOCKS5 proxy (default: ${DEFAULT_PORT})"
+        exit 1
+        ;;
+esac
+
+exit 0</code></pre>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 SOCKS5 Proxy Server. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function copyScript() {
+            const scriptContent = document.getElementById('installScriptContent').innerText;
+            navigator.clipboard.writeText(scriptContent).then(() => {
+                alert('脚本内容已复制到剪贴板！');
+            }).catch(err => {
+                console.error('复制失败: ', err);
+                alert('复制失败，请手动复制。');
+            });
+        }
+    </script>
+</body>
+</html>
