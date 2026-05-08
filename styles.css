@@ -1,0 +1,345 @@
+/* Basic Styles */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --accent-color: #28a745;
+    --background-color: #f8f9fa;
+    --text-color: #343a40;
+    --light-text-color: #6c757d;
+    --border-color: #dee2e6;
+    --header-bg-color: #343a40;
+    --header-text-color: #ffffff;
+    --footer-bg-color: #343a40;
+    --footer-text-color: #ffffff;
+    --code-bg-color: #272822;
+    --code-text-color: #f8f8f2;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Header */
+header {
+    background: var(--header-bg-color);
+    color: var(--header-text-color);
+    padding: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    padding-bottom: 10px;
+}
+
+header nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+header nav ul li {
+    margin: 0 15px;
+}
+
+header nav a {
+    color: var(--header-text-color);
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+}
+
+header nav a:hover {
+    color: var(--primary-color);
+}
+
+/* Free Proxy Link */
+.free-proxy-link {
+    background-color: #ffc107; /* A bright, eye-catching color */
+    padding: 10px 20px;
+    margin-top: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: pulse 2s infinite;
+}
+
+.free-proxy-link a {
+    color: var(--text-color);
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+
+.free-proxy-link a:hover {
+    text-decoration: underline;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+}
+
+/* Main Content */
+main {
+    flex: 1;
+    padding: 2rem 0;
+}
+
+.content-section {
+    background: #ffffff;
+    padding: 30px;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.content-section h2,
+.content-section h3,
+.content-section h4 {
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.content-section h3 {
+    font-size: 1.8rem;
+}
+
+.content-section h4 {
+    font-size: 1.4rem;
+}
+
+.content-section p {
+    margin-bottom: 1rem;
+    line-height: 1.8;
+    color: var(--light-text-color);
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    background: var(--header-bg-color) url('https://via.placeholder.com/1500x400/343a40/ffffff?text=SOCKS5+Proxy+Server') no-repeat center center/cover;
+    color: var(--header-text-color);
+    padding: 80px 0;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.hero h2 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    color: var(--header-text-color);
+}
+
+.hero p {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Buttons */
+.button {
+    display: inline-block;
+    color: #ffffff;
+    background: var(--primary-color);
+    padding: 12px 25px;
+    text-decoration: none;
+    border-radius: 50px;
+    margin: 8px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.button:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.button.primary {
+    background: var(--primary-color);
+}
+
+.button.primary:hover {
+    background: #0056b3;
+}
+
+.button.secondary {
+    background: var(--secondary-color);
+}
+
+.button.secondary:hover {
+    background: #545b62;
+}
+
+.button.download {
+    background: var(--accent-color);
+}
+
+.button.download:hover {
+    background: #218838;
+}
+
+/* Feature Grid */
+.feature-grid,
+.download-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.feature-item,
+.download-item {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s ease;
+}
+
+.feature-item:hover,
+.download-item:hover {
+    transform: translateY(-5px);
+}
+
+.feature-item h4,
+.download-item h3 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.download-item p {
+    flex-grow: 1; /* Allows paragraph to take up available space */
+    margin-bottom: 20px;
+}
+
+/* Code Blocks */
+pre {
+    background: var(--code-bg-color);
+    color: var(--code-text-color);
+    padding: 1.2rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+}
+
+/* Lists */
+ul,
+ol {
+    list-style-position: inside;
+    margin-left: 0;
+    padding-left: 20px;
+    margin-bottom: 1rem;
+}
+
+ul li,
+ol li {
+    margin-bottom: 0.5rem;
+}
+
+/* Copy Button for Script */
+.copy-button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.copy-button:hover {
+    background-color: #0056b3;
+}
+
+/* Footer */
+footer {
+    background: var(--footer-bg-color);
+    color: var(--footer-text-color);
+    text-align: center;
+    padding: 1.5rem 0;
+    margin-top: 2rem;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    header nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    header nav ul li {
+        margin: 5px 0;
+    }
+
+    .hero h2 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+    }
+
+    .button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    .feature-grid,
+    .download-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .content-section {
+        padding: 20px;
+    }
+}
