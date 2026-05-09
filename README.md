@@ -3,7 +3,7 @@
 详细内容请访问网页端: 
 
 ```
-https:// moyercus.github.io
+https://moyercus.github.io
 ```
 
 一个功能完整的SOCKS5代理服务器，支持TCP和UDP转发，以及用户名/密码认证。
